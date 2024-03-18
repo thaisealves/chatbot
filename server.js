@@ -13,79 +13,77 @@ client.on('ready', () => {
     console.log('Client is ready!');
 });
 
-client.on('message', async (message) =>{
-    console.log(message.body)
-})
+let nomeCompleto = '';
+let telefone = '';
+let dataNascimento = '';
+let convenio = '';
 
-client.on('message', async (message)=>{
-    let myname = client.info
-    let client = {
-        name,
-        telephone,
-        healthInsurance,
-        birthday,
+// Estado atual da coleta de dados
+let perguntaAtual = 'inicial';
+
+
+
+
+client.on('message', (message) => {
+    switch (perguntaAtual) {
+      
+      case 'inicial':
         
+        perguntaAtual = 'nomeCompleto';
+        message.reply('Olá, bem vindo(a), Primeiramente, qual o seu nome completo?');
+        break;  
+      case 'nomeCompleto':
+        nomeCompleto = message.body;
+        perguntaAtual = 'telefone';
+        message.reply('Qual o seu número de telefone com DDD?');
+        break;
+      case 'telefone':
+        telefone = message.body;
+        perguntaAtual = 'dataNascimento';
+        message.reply('Qual a sua data de nascimento?');
+        break;
+      case 'dataNascimento':
+        dataNascimento = message.body;
+        perguntaAtual = 'convenio';
+        message.reply('Qual o seu convênio? Se não tiver nenhum, coloque PARTICULAR');
+        break;
+      case 'convenio':
+        convenio = message.body;
+        perguntaAtual = 'confirmation'
+        message.reply( `
+        *Confirme seus dados:* 
+        *Nome:* ${nomeCompleto}
+        *Telefone:* ${telefone}
+        *Data de Nascimento:* ${dataNascimento}
+        *Convenio:*  ${convenio}
+        
+        Se seus dados estão corretos
+        *Digite 1*
+        Se quiser corrigir:
+        *Digite 2*`);
+        
+        
+        // Exemplo de envio dos dados para um sistema de CRM
+        // ...
+        // Reiniciar a coleta de dados
+        
+        break;
+      case 'confirmation':
+        if(message.body === '2'){
+            message.reply("Para começar, qual seu nome completo?")
+            perguntaAtual = 'nomeCompleto'
+            
+
+        }else if(message.body === '1'){
+            message.reply("Estaremos te transferindo para um atendente para finalizar o seu agendamento")
+            perguntaAtual = ""
+            console.log("opçao 2")
+        }
+        
+        
+        break
     }
-
-    
-    
-    if (message.body === "0") {
-        greetings()
-        firstMenu()
-        
-
-     }
-     if (message.body === "1"){
-        budget()
-        
-     }
-
-
-
-     async function greetings(){
-        
-       
-
-        return message.reply("Olá, seja bem vindo, Eu sou o seu assistente virtual e vou te ajudar"); 
-         
-     }
-     async function name(){
-         return  client.sendMessage(message.from, 'Primeiramente, Qual o nome completo do paciente?');
-         
-         
-     }
-     async function typeName(){
-        
-
-
-     }
-     async function firstMenu(){
-        name()
-        
-        schedule()
-     }
-     async function schedule(){
-         
-         
-         return client.sendMessage(message.from, `Selecione uma das opções:
-                                                                      1- Orçamento
-                                                                      2- Agendamento
-                                                                      3- Financeiro
-                                                                      4- Outros`)
-     }
-     async function budget(){
-        return client.sendMessage(message.from, `Selecione qual exame:
-                                     1- Ressonancia
-                                     2- Ultrassom
-                                     3- Densitometria
-                                     4- Mamografia`)
-
-        
-     }
-     
-
-}  
-    
+  });
 
     
     
@@ -96,6 +94,5 @@ client.on('message', async (message)=>{
     
 
     
-)
 
 client.initialize();
